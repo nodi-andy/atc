@@ -1,0 +1,86 @@
+<canvas id="myCanvas" style="position:absolute; border-style:solid; height:800px; width:600px;"></canvas>
+<script>
+    var context = document.getElementById("myCanvas").getContext("2d");
+    context.canvas.width  = 600;
+    context.canvas.height = 800;
+    var ball 		= {id: 0,   x:100	, y: 100	, r: 5, vx: 0.3		, vy: -0.4,     path: []}
+    var balls       = [ball];
+    var target 		= {x:300	, y: 400	, r: 20}
+    var selBall     = undefined;
+    var gameOver 	= 0;
+    var spawnCounter = 100;
+    var idCounter   = 1;
+
+    context.canvas.addEventListener('mousedown', e => {
+        balls.forEach(b => {
+            if (getDistance({x: e.offsetX, y: e.offsetY, r: 15}, b) < 0) {
+                isDrawing = true;
+                selBall = b;
+                selBall.path = [];
+            }
+        })
+    });
+    context.canvas.addEventListener('mousemove', e => {
+        if (selBall) {
+            selBall.path.push({x: e.x, y:e.y})
+        }
+    });
+    context.canvas.addEventListener('mouseup', e => {
+        selBall = undefined;
+    });
+    render();
+    function render(){ 
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        context.beginPath();
+        context.arc(target.x, target.y, target.r, 0, Math.PI * 2); 
+        context.stroke();
+        for (let i = 0; i < balls.length; i++) {
+            let b = balls[i];
+            b.x      = b.x + b.vx;
+            b.y      = b.y + b.vy;
+            context.beginPath();
+            context.arc(b.x, b.y, b.r, 0, Math.PI * 2); 
+            context.stroke();
+            context.beginPath(); // draw the path
+            b.path.forEach(p => context.lineTo(p.x, p.y))
+            context.stroke();  
+            if (b.path.length) {  // follow the path
+                var t = b.path[0];
+                var d = {x: t.x - b.x, y: t.y - b.y}
+                var d_len = Math.sqrt(d.x * d.x + d.y * d.y) / 2;
+                if (d_len < 0.5) {
+                    b.path.shift();
+                } else {
+                    b.vx = d.x / d_len;
+                    b.vy = d.y / d_len;
+                }
+            }
+            for (let j = i + 1; j < balls.length; j++) {
+                nb = balls[j];
+                if (getDistance(nb, b) < 0) gameOver = 1;
+            }
+
+            if (b.x < 0 || b.x > context.canvas.width || b.y < 0 || b.y > context.canvas.height) gameOver = 1;
+            if (getDistance(target, b) < 0) {
+                balls = balls.filter(removingBall => removingBall.id != b.id);
+            }
+        }
+        if (spawnCounter-- < 0) {
+            spawnCounter = 100;
+            balls.push({
+                id: idCounter++, 
+                x: (Math.random()/2+0.25)*context.canvas.width, 
+                y: (Math.random()/2+0.25)*context.canvas.height, 
+                r: (Math.random()*20+5),
+                vx: Math.random(), 
+                vy: Math.random(),
+                path: []})
+        }
+        if (gameOver == 0) setTimeout(render, 20);
+    }
+    function getDistance(b1, b2) {
+        var d = {x: b1.x - b2.x, y: b1.y - b2.y}
+        var distance = Math.sqrt(d.x * d.x + d.y * d.y);
+        return distance - (b1.r + b2.r);
+    }
+</script>
