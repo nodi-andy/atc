@@ -1,6 +1,8 @@
 # air traffic control
 Simplest vanilla javascript air traffic control game
 
+![Screenshot](https://github.com/nodi-andy/atc/blob/main/atc_screenshot.png)
+
 # single player
 Play the game here using [github.io](https://htmlpreview.github.io/?https://github.com/nodi-andy/atc/blob/main/single_player/index.html)
 
@@ -15,16 +17,7 @@ Play the game here using [github.io](https://htmlpreview.github.io/?https://gith
 - assign events to functions
 - start and keep rendering
 - draw the scene
-- move the ball
-- move the racket
-- hit the ball
 - game over
-
-# multiplayer
-
-https://nodejs.org/en/download/
-
-chrome://flags/#allow-insecure-localhost
 
 
 # compile exe
